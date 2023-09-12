@@ -28,7 +28,7 @@ const Sidebar = () => {
     },
     {
       name: "Account",
-      link: "/account",
+      link: "/",
       visible: userInfo?.role === "Admin" || "Superadmin",
     },
 

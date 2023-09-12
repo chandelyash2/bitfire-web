@@ -3,10 +3,17 @@ import { Modal } from "./common/Modal";
 import { Input } from "./common/Input";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { forgetPasswordSchema } from "./User/userSchema";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { PrimaryButton } from "./common/PrimaryButton";
+import { useChangePasswordMutation } from "@/graphql/generated/schema";
+import toast, { Toaster } from "react-hot-toast";
+import { Loader } from "./common/Loader";
 interface ChangePasswordProp {
   setChangePassword: (value: boolean) => void;
+}
+interface FormValues {
+  oldPassword: string;
+  newPassword: string;
 }
 export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
   const {
@@ -16,11 +23,30 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
   } = useForm({
     resolver: yupResolver(forgetPasswordSchema),
   });
+  const [changePswd, { loading }] = useChangePasswordMutation();
+  const submiHandler: SubmitHandler<FormValues> = async (data) => {
+    const response = await changePswd({
+      variables: {
+        input: {
+          oldPassword: data.oldPassword,
+          newPassword: data.newPassword,
+        },
+      },
+    });
+    const output = response.data?.changePassword;
+    if (output?.error) {
+      toast.error(output.error.message);
+    }
+    if (output?.user) {
+      toast.success("Password Changed Successfully");
+      setChangePassword(false);
+    }
+  };
   return (
     <Modal close={() => setChangePassword(false)}>
       <h1 className="font-bold text-xl">Change Password</h1>
 
-      <form className="mt-5 w-full" onSubmit={handleSubmit((data)=>console.log(data,'forhet'))}>
+      <form className="mt-5 w-full" onSubmit={handleSubmit(submiHandler)}>
         <Input
           label="Old Password"
           name="oldPassword"
@@ -42,7 +68,9 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
           error={errors.repeatPassword?.message}
           register={register}
         />
-        <PrimaryButton label="Change"/>
+        <PrimaryButton label="Change" />
+        <Toaster />
+        {loading && <Loader />}
       </form>
     </Modal>
   );

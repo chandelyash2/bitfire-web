@@ -1,8 +1,8 @@
-import { Dashboard } from "@/components/Dashboard";
+import { Account } from "@/components/Account";
 import React from "react";
 
-const index = () => {
-  return <Dashboard />;
+const AccountPage = () => {
+  return <Account />;
 };
 
-export default index;
+export default AccountPage;

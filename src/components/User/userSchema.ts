@@ -16,7 +16,13 @@ export const agentSchema = yup.object().shape({
 });
 export const forgetPasswordSchema = yup.object().shape({
   oldPassword: yup.string().required("Old Password is required"),
-  newPassword: yup.string().required("New Password is required"),
+  newPassword: yup
+    .string()
+    .required("New Password is required")
+    .notOneOf(
+      [yup.ref("oldPassword")],
+      "Old and new passwords must be different"
+    ),
   repeatPassword: yup
     .string()
     .required("Repeat Password is required")

@@ -41,7 +41,7 @@ export const Login = () => {
     const response = result.data?.authLogin;
     if (response?.user) {
       cookies.set("token", response.token);
-      router.push("/account");
+      router.push("/");
     }
     if (response?.error) {
       toast.error(response?.error?.message);

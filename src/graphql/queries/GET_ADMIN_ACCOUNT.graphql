@@ -1,0 +1,21 @@
+query GetAdminAccount {
+  getAdminAccount {
+    admin {
+      _id
+      name
+      userName
+      phone
+      password
+      role
+      status
+      creditLimit
+      availableCredit
+      creditGivenToAgent
+      creditDistributedByAgent
+    }
+    error {
+      message
+      code
+    }
+  }
+}

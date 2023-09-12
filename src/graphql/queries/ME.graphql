@@ -1,0 +1,19 @@
+query Me {
+  me {
+    user {
+      _id
+      name
+      userName
+      phone
+      password
+      role
+      availableCredit
+      creditLimit
+      status
+    }
+    error {
+      message
+      code
+    }
+  }
+}

@@ -1,0 +1,16 @@
+mutation AuthLogin($input: AuthInput) {
+  authLogin(input: $input) {
+    token
+    user {
+      _id
+      name
+      userName
+      password
+      role
+    }
+    error {
+      message
+      code
+    }
+  }
+}

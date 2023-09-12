@@ -1,0 +1,20 @@
+mutation RegisterUser($input: SignUpInput) {
+  registerUser(input: $input) {
+    user {
+      _id
+      name
+      userName
+      phone
+      password
+      role
+      status
+      availableCredit
+      creditLimit
+    }
+    token
+    error {
+      code
+      message
+    }
+  }
+}

@@ -1,0 +1,19 @@
+query GetAdmins($input: GetAdminInput) {
+  getAdmins(input: $input) {
+    admin {
+      _id
+      name
+      userName
+      phone
+      password
+      role
+      status
+      creditLimit
+      availableCredit
+    }
+    error {
+      code
+      message
+    }
+  }
+}

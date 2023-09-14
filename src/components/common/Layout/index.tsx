@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import Sidebar from "./Sidebar";
 import { Header } from "./Header";
-import { useMeQuery } from "@/graphql/generated/schema";
 import { useRouter } from "next/router";
 import { Loader } from "../Loader";
 import { CMSModal } from "@/context";
 import { Footer } from "./Footer";
+import { useMeSuperAdminQuery } from "@/graphql/generated/schema";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,9 +13,9 @@ interface LayoutProps {
 const img = "/home.jpg";
 
 export const Layout = ({ children }: LayoutProps) => {
-  const { loading, data } = useMeQuery();
+  const { loading, data } = useMeSuperAdminQuery();
   const { setUserInfo } = useContext(CMSModal);
-  const response = data?.me;
+  const response = data?.meSuperAdmin;
   const router = useRouter();
   if (loading) {
     return (
@@ -28,8 +28,8 @@ export const Layout = ({ children }: LayoutProps) => {
   if (!response) {
     router.push("/login");
   }
-  if (response?.user) {
-    setUserInfo(response.user);
+  if (response?.superAdmin) {
+    setUserInfo(response.superAdmin);
   }
   return (
     <div
@@ -37,7 +37,7 @@ export const Layout = ({ children }: LayoutProps) => {
       style={{ backgroundImage: `url(${img})` }}
     >
       <div className="lg:flex-[.5]">
-        {response?.user && <Sidebar />}
+        {response?.superAdmin && <Sidebar />}
         <Header />
       </div>
       <div className="lg:flex-[2] lg:mt-40">{children}</div>

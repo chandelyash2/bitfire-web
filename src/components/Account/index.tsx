@@ -2,12 +2,13 @@ import React, { useContext, useState } from "react";
 import { Layout } from "../common/Layout";
 import Container from "../common/Container";
 import { BalanceBanner } from "../common/BalanceBanner";
-import { useGetAdminAccountQuery } from "@/graphql/generated/schema";
 import { Loader } from "../common/Loader";
+import { CMSModal } from "@/context";
 
 export const Account = () => {
-  const { data, loading } = useGetAdminAccountQuery();
-  const adminData = data?.getAdminAccount?.admin;
+  const { userInfo } = useContext(CMSModal);
+  console.log(userInfo, "userInfo");
+
   return (
     <Layout>
       <Container>
@@ -38,19 +39,19 @@ export const Account = () => {
             <div className="flex lg:w-[50%]">
               <span className="flex-1">Credit Limit</span>
               <span className="flex-2">
-                {adminData?.creditLimit?.toLocaleString("en-US")}
+                {userInfo?.creditLimit?.toLocaleString("en-US")}
               </span>
             </div>
             <div className="flex lg:w-[50%]">
               <span className="flex-1">Available Credit</span>
               <span className="flex-2">
-                {adminData?.availableCredit?.toLocaleString("en-US")}
+                {userInfo?.availableCredit?.toLocaleString("en-US")}
               </span>
             </div>
             <div className="flex lg:w-[50%]">
               <span className="flex-1">Total credit given to Agents</span>
               <span className="flex-2">
-                {adminData?.creditGivenToAgent?.toLocaleString("en-US")}
+                {userInfo?.creditGivenToAgent?.toLocaleString("en-US")}
               </span>
             </div>
             <div className="flex lg:w-[50%]">
@@ -58,7 +59,6 @@ export const Account = () => {
               <span className="flex-2">0.00</span>
             </div>
           </div>
-          {loading && <Loader />}
         </div>
       </Container>
     </Layout>

@@ -1,0 +1,13 @@
+mutation DeleteAdmin($deleteAdminId: ID!) {
+  deleteAdmin(id: $deleteAdminId) {
+    admin {
+      _id
+      name
+      userName
+    }
+    error {
+      message
+      code
+    }
+  }
+}

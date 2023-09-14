@@ -1,16 +1,16 @@
-query GetAdmins($input: AdminListInput) {
-  getAdmins(input: $input) {
-    admin {
+query MeSuperAdmin {
+  meSuperAdmin {
+    superAdmin {
       _id
-      parentId
       name
       userName
-      phone
       password
       role
       status
       creditLimit
       availableCredit
+      creditGivenToAgent
+      creditDistributedByAgent
     }
     error {
       message

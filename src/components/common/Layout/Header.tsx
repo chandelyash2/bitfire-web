@@ -6,7 +6,6 @@ import { CMSModal } from "@/context";
 import Cookies from "universal-cookie";
 export const Header = () => {
   const { userInfo } = useContext(CMSModal);
-  console.log(userInfo, "header");
   const listing = [
     {
       name: "Agent Management",
@@ -17,7 +16,7 @@ export const Header = () => {
     {
       name: "User",
       link: "/users",
-      visible: userInfo?.role === "Admin" || "Superadmin",
+      visible: userInfo?.role === "Admin",
     },
     {
       name: "Account",

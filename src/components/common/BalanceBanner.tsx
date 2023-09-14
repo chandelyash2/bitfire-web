@@ -14,7 +14,6 @@ export const BalanceBanner = () => {
       <h2>
         Available Credit:
         <span className="">
-          {" "}
           {userInfo?.availableCredit.toLocaleString("en-US")}.00
         </span>
       </h2>

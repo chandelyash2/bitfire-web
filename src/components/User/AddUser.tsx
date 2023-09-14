@@ -5,15 +5,11 @@ import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { agentSchema } from "./userSchema";
-import {
-  GetAdminAccountDocument,
-  MeDocument,
-  UserRole,
-  useRegisterUserMutation,
-} from "@/graphql/generated/schema";
+
 import { Toaster, toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
 import { agentName, randomPassword } from "@/utils/uniqueGenerator";
+import { MeSuperAdminDocument, useRegisterAdminMutation } from "@/graphql/generated/schema";
 
 interface AddUserProps {
   label: string;
@@ -43,8 +39,8 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
     },
   });
 
-  const [addUser, { loading: addUserLoading }] = useRegisterUserMutation({
-    refetchQueries: [MeDocument, GetAdminAccountDocument],
+  const [addUser, { loading: addUserLoading }] = useRegisterAdminMutation({
+    refetchQueries: [MeSuperAdminDocument],
   });
   const submitHandler: SubmitHandler<FormValues> = async (value) => {
     const result = await addUser({
@@ -52,15 +48,13 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
         input: {
           name: value.name,
           password: value.password,
-          phone: value.phone,
-          creditLimit: value.creditLimit,
+          creditLimit: value.creditLimit.toString(),
           userName: value.userName,
-          role: label === "Add User" ? UserRole.User : UserRole.Admin,
         },
       },
     });
-    const response = result.data?.registerUser;
-    if (response?.user) {
+    const response = result.data?.registerAdmin;
+    if (response?.admin) {
       toast.success(label === "Add User" ? "User Added" : "Agent Added");
       refetch();
       setAddUser(false);

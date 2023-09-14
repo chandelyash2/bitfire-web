@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal } from "../common/Modal";
-import { useDeleteUserMutation } from "@/graphql/generated/schema";
+import { useDeleteAdminMutation } from "@/graphql/generated/schema";
 import toast, { Toaster } from "react-hot-toast";
 import { PrimaryButton } from "../common/PrimaryButton";
 import Container from "../common/Container";
@@ -19,21 +19,21 @@ export const DeleteUser = ({
   setDeleteUser,
   refetch,
 }: DeleteProps) => {
-  const [deleteUser, { loading: deleteuserLaoding }] = useDeleteUserMutation();
+  const [deleteUser, { loading: deleteuserLaoding }] = useDeleteAdminMutation();
 
   const handleDelete = async () => {
     const result =
       selectedUser &&
       (await deleteUser({
         variables: {
-          deleteUserId: selectedUser?._id,
+          deleteAdminId: selectedUser?._id,
         },
       }));
-    const response = result?.data?.deleteUser;
+    const response = result?.data?.deleteAdmin;
     if (response?.error) {
       toast.error(response.error.message);
     }
-    if (response?.user) {
+    if (response?.admin) {
       toast.success("User Deleted Successfully");
       setDeleteUser(false);
       refetch();

@@ -4,12 +4,12 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ButtonType, PrimaryButton } from "../common/PrimaryButton";
-import { useAuthLoginMutation } from "@/graphql/generated/schema";
 import Cookies from "universal-cookie";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { Loader } from "../common/Loader";
 import { useState } from "react";
+import { useAuthSuperAdminMutation } from "@/graphql/generated/schema";
 interface FormValues {
   userName: string;
   password: string;
@@ -26,7 +26,7 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(FormSchema) });
-  const [login, { loading: userLoading }] = useAuthLoginMutation();
+  const [login, { loading: userLoading }] = useAuthSuperAdminMutation();
   const cookies = new Cookies();
   const router = useRouter();
   const submitHandler: SubmitHandler<FormValues> = async (data) => {
@@ -38,8 +38,8 @@ export const Login = () => {
         },
       },
     });
-    const response = result.data?.authLogin;
-    if (response?.user) {
+    const response = result.data?.authSuperAdmin;
+    if (response?.superAdmin) {
       cookies.set("token", response.token);
       router.push("/");
     }

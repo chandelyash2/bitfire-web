@@ -18,18 +18,18 @@ const Sidebar = () => {
     {
       name: "Agent Management",
       link: "/agent",
-      visible: userInfo?.role === "Superadmin",
+      visible: userInfo?.role === "SuperAdmin",
     },
 
     {
       name: "User",
       link: "/users",
-      visible: userInfo?.role === "Admin" || "Superadmin",
+      visible: userInfo?.role === "Admin",
     },
     {
       name: "Account",
       link: "/",
-      visible: userInfo?.role === "Admin" || "Superadmin",
+      visible: userInfo?.role === "Admin" || "SuperAdmin",
     },
 
     {

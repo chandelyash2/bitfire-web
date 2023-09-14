@@ -1,10 +1,10 @@
-query GetAdminAccount {
-  getAdminAccount {
-    admin {
+mutation AuthSuperAdmin($input: AuthInput) {
+  authSuperAdmin(input: $input) {
+    token
+    superAdmin {
       _id
       name
       userName
-      phone
       password
       role
       status

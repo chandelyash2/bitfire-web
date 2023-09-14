@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Layout } from "../common/Layout";
 import Container from "../common/Container";
 import { PrimaryButton } from "../common/PrimaryButton";
-import { AdminRole, User, useGetAdminsQuery } from "@/graphql/generated/schema";
+import { Admin, User, useGetAdminsQuery } from "@/graphql/generated/schema";
 import { AdminType, UserType } from "../types";
 import Image from "next/image";
 import { Loader } from "../common/Loader";
@@ -27,13 +27,12 @@ const Agent = () => {
   const { loading, data, refetch } = useGetAdminsQuery({
     variables: {
       input: {
-        filter: AdminRole.Admin,
         limit: 10,
         offset: 0,
       },
     },
   });
-  const users:any = data?.getAdmins?.admin;
+  const users: any = data?.getAdmins?.admin;
   const handleAddUser = () => {
     setLabel("Add Agent");
     setAddModal(true);
@@ -68,7 +67,7 @@ const Agent = () => {
 
             <tbody className="flex flex-col gap-4 text-center">
               {users &&
-                users.map((user:User) => (
+                users.map((user: Admin) => (
                   <tr
                     className="flex justify-between lg:grid grid-cols-7 gap-2 text-center"
                     key={user?._id}
@@ -78,7 +77,7 @@ const Agent = () => {
                     <td>{user?.status ? "Active" : "Inactive"}</td>
                     <td className="text-green-400">0.00</td>
                     <td className="text-green-400">0.00</td>
-                    <td>{user?.creditLimit}</td>
+                    <td>{user.creditLimit}</td>
 
                     <td>
                       <div className="flex">

@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Loader } from "../Loader";
 import { CMSModal } from "@/context";
 import { Footer } from "./Footer";
-import { useMeSuperAdminQuery } from "@/graphql/generated/schema";
+import { useMeQuery } from "@/graphql/generated/schema";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,9 +13,11 @@ interface LayoutProps {
 const img = "/home.jpg";
 
 export const Layout = ({ children }: LayoutProps) => {
-  const { loading, data } = useMeSuperAdminQuery();
+  const { loading, data } = useMeQuery({
+    fetchPolicy: "no-cache",
+  });
   const { setUserInfo } = useContext(CMSModal);
-  const response = data?.meSuperAdmin;
+  const response = data?.me;
   const router = useRouter();
   if (loading) {
     return (
@@ -24,23 +26,22 @@ export const Layout = ({ children }: LayoutProps) => {
       </>
     );
   }
-  console.log(response, "ress");
   if (!response) {
     router.push("/login");
   }
-  if (response?.superAdmin) {
-    setUserInfo(response.superAdmin);
+  if (response?.admin) {
+    setUserInfo(response.admin);
   }
   return (
     <div
-      className="absolute top-0 bg-no-repeat w-screen bg-cover z-1 flex flex-col lg:flex-row"
+      className="absolute top-0 bg-no-repeat w-screen h-screen bg-cover z-1 flex flex-col justify-between"
       style={{ backgroundImage: `url(${img})` }}
     >
-      <div className="lg:flex-[.5]">
-        {response?.superAdmin && <Sidebar />}
-        <Header />
+      <Header />
+      <div className="lg:flex justify-center">
+        <div className="lg:flex-[.5]">{response?.admin && <Sidebar />}</div>
+        <div className="lg:flex-[2] lg:mt-32">{children}</div>
       </div>
-      <div className="lg:flex-[2] lg:mt-40">{children}</div>
       <Footer />
     </div>
   );

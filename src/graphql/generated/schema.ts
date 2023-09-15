@@ -21,18 +21,20 @@ export type Admin = {
   __typename?: 'Admin';
   _id: Scalars['ID']['output'];
   availableCredit?: Maybe<Scalars['Int']['output']>;
+  creditDistributedByAgent?: Maybe<Scalars['Int']['output']>;
+  creditGivenToAgent?: Maybe<Scalars['Int']['output']>;
   creditLimit?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   parentId?: Maybe<Scalars['String']['output']>;
   password?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<Scalars['String']['output']>;
+  role?: Maybe<AdminRole>;
   status?: Maybe<Scalars['Boolean']['output']>;
   userName: Scalars['String']['output'];
 };
 
 export type AdminAuthInput = {
-  creditLimit: Scalars['String']['input'];
+  creditLimit: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   userName: Scalars['String']['input'];
@@ -45,22 +47,16 @@ export type AdminAuthPayload = {
   token?: Maybe<Scalars['String']['output']>;
 };
 
-export type AdminListInput = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type AdminListPayload = {
-  __typename?: 'AdminListPayload';
-  admin?: Maybe<Array<Maybe<Admin>>>;
-  error?: Maybe<ErrorType>;
-};
-
 export type AdminPayload = {
   __typename?: 'AdminPayload';
   admin?: Maybe<Admin>;
   error?: Maybe<ErrorType>;
 };
+
+export enum AdminRole {
+  Admin = 'admin',
+  Superadmin = 'superadmin'
+}
 
 export type AuthInput = {
   password: Scalars['String']['input'];
@@ -85,19 +81,21 @@ export type ErrorType = {
   message: Scalars['String']['output'];
 };
 
+export type GetAdminInput = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   authAdmin?: Maybe<AdminAuthPayload>;
   authLogin?: Maybe<AuthPayload>;
-  authSuperAdmin?: Maybe<SuperAdminPayload>;
-  changePassword?: Maybe<UserPayload>;
-  changeSuperAdminPassword?: Maybe<SuperAdminPayload>;
+  changePassword?: Maybe<AuthPayload>;
   deleteAdmin?: Maybe<AdminPayload>;
-  deleteUser?: Maybe<UserPayload>;
+  deleteUser?: Maybe<AuthPayload>;
   registerAdmin?: Maybe<AdminAuthPayload>;
-  registerSuperAdmin?: Maybe<SuperAdminPayload>;
   registerUser?: Maybe<AuthPayload>;
-  updateUser?: Maybe<UserPayload>;
+  updateUser?: Maybe<AuthPayload>;
 };
 
 
@@ -111,18 +109,8 @@ export type MutationAuthLoginArgs = {
 };
 
 
-export type MutationAuthSuperAdminArgs = {
-  input?: InputMaybe<AuthInput>;
-};
-
-
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
-};
-
-
-export type MutationChangeSuperAdminPasswordArgs = {
-  input?: InputMaybe<ChangePasswordInput>;
 };
 
 
@@ -141,11 +129,6 @@ export type MutationRegisterAdminArgs = {
 };
 
 
-export type MutationRegisterSuperAdminArgs = {
-  input?: InputMaybe<SuperAdminSignupInput>;
-};
-
-
 export type MutationRegisterUserArgs = {
   input?: InputMaybe<SignUpInput>;
 };
@@ -157,15 +140,14 @@ export type MutationUpdateUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getAdmins?: Maybe<AdminListPayload>;
+  getAdmins?: Maybe<Array<Maybe<Admin>>>;
   getUsers?: Maybe<UsersPayload>;
-  me: UserPayload;
-  meSuperAdmin?: Maybe<SuperAdminPayload>;
+  me?: Maybe<AdminPayload>;
 };
 
 
 export type QueryGetAdminsArgs = {
-  input?: InputMaybe<AdminListInput>;
+  input?: InputMaybe<GetAdminInput>;
 };
 
 
@@ -177,34 +159,6 @@ export type SignUpInput = {
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
-  userName: Scalars['String']['input'];
-};
-
-export type SuperAdmin = {
-  __typename?: 'SuperAdmin';
-  _id: Scalars['ID']['output'];
-  availableCredit?: Maybe<Scalars['Int']['output']>;
-  creditDistributedByAgent?: Maybe<Scalars['Int']['output']>;
-  creditGivenToAgent?: Maybe<Scalars['Int']['output']>;
-  creditLimit?: Maybe<Scalars['Int']['output']>;
-  name: Scalars['String']['output'];
-  password?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<Scalars['String']['output']>;
-  status?: Maybe<Scalars['Boolean']['output']>;
-  userName: Scalars['String']['output'];
-};
-
-export type SuperAdminPayload = {
-  __typename?: 'SuperAdminPayload';
-  error?: Maybe<ErrorType>;
-  superAdmin?: Maybe<SuperAdmin>;
-  token?: Maybe<Scalars['String']['output']>;
-};
-
-export type SuperAdminSignupInput = {
-  creditLimit: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
   userName: Scalars['String']['input'];
 };
 
@@ -227,12 +181,6 @@ export type User = {
   userName: Scalars['String']['output'];
 };
 
-export type UserPayload = {
-  __typename?: 'UserPayload';
-  error?: Maybe<ErrorType>;
-  user?: Maybe<User>;
-};
-
 export type UsersInput = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -244,63 +192,84 @@ export type UsersPayload = {
   user?: Maybe<Array<Maybe<User>>>;
 };
 
-export type AuthSuperAdminMutationVariables = Exact<{
+export type AuthAdminMutationVariables = Exact<{
   input?: InputMaybe<AuthInput>;
 }>;
 
 
-export type AuthSuperAdminMutation = { __typename?: 'Mutation', authSuperAdmin?: { __typename?: 'SuperAdminPayload', token?: string | null, superAdmin?: { __typename?: 'SuperAdmin', _id: string, name: string, userName: string, password?: string | null, role?: string | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null, creditGivenToAgent?: number | null, creditDistributedByAgent?: number | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type AuthAdminMutation = { __typename?: 'Mutation', authAdmin?: { __typename?: 'AdminAuthPayload', token?: string | null, admin?: { __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string, phone?: string | null, password?: string | null, role?: AdminRole | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword?: { __typename?: 'UserPayload', user?: { __typename?: 'User', userName: string, status?: boolean | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword?: { __typename?: 'AuthPayload', user?: { __typename?: 'User', _id: string, name: string, userName: string } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
 
 export type DeleteAdminMutationVariables = Exact<{
   deleteAdminId: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAdminMutation = { __typename?: 'Mutation', deleteAdmin?: { __typename?: 'AdminPayload', admin?: { __typename?: 'Admin', _id: string, name: string, userName: string } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type DeleteAdminMutation = { __typename?: 'Mutation', deleteAdmin?: { __typename?: 'AdminPayload', admin?: { __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+
+export type DeleteUserMutationVariables = Exact<{
+  deleteUserId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser?: { __typename?: 'AuthPayload', token?: string | null, user?: { __typename?: 'User', phone?: string | null, userName: string, _id: string } | null, error?: { __typename?: 'ErrorType', code: string, message: string } | null } | null };
 
 export type RegisterAdminMutationVariables = Exact<{
   input?: InputMaybe<AdminAuthInput>;
 }>;
 
 
-export type RegisterAdminMutation = { __typename?: 'Mutation', registerAdmin?: { __typename?: 'AdminAuthPayload', token?: string | null, admin?: { __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type RegisterAdminMutation = { __typename?: 'Mutation', registerAdmin?: { __typename?: 'AdminAuthPayload', error?: { __typename?: 'ErrorType', code: string, message: string } | null, admin?: { __typename?: 'Admin', _id: string, name: string, role?: AdminRole | null } | null } | null };
 
-export type GetAdminsQueryVariables = Exact<{
-  input?: InputMaybe<AdminListInput>;
+export type RegisterUserMutationVariables = Exact<{
+  input?: InputMaybe<SignUpInput>;
 }>;
 
 
-export type GetAdminsQuery = { __typename?: 'Query', getAdmins?: { __typename?: 'AdminListPayload', admin?: Array<{ __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string, phone?: string | null, password?: string | null, role?: string | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null } | null> | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type RegisterUserMutation = { __typename?: 'Mutation', registerUser?: { __typename?: 'AuthPayload', token?: string | null, user?: { __typename?: 'User', _id: string, name: string, userName: string, phone?: string | null, password?: string | null, status?: boolean | null, role?: string | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
 
-export type MeSuperAdminQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAdminsQueryVariables = Exact<{
+  input?: InputMaybe<GetAdminInput>;
+}>;
 
 
-export type MeSuperAdminQuery = { __typename?: 'Query', meSuperAdmin?: { __typename?: 'SuperAdminPayload', superAdmin?: { __typename?: 'SuperAdmin', _id: string, name: string, userName: string, password?: string | null, role?: string | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null, creditGivenToAgent?: number | null, creditDistributedByAgent?: number | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+export type GetAdminsQuery = { __typename?: 'Query', getAdmins?: Array<{ __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string, phone?: string | null, password?: string | null, role?: AdminRole | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null } | null> | null };
+
+export type GetUsersQueryVariables = Exact<{
+  input?: InputMaybe<UsersInput>;
+}>;
 
 
-export const AuthSuperAdminDocument = gql`
-    mutation AuthSuperAdmin($input: AuthInput) {
-  authSuperAdmin(input: $input) {
-    token
-    superAdmin {
+export type GetUsersQuery = { __typename?: 'Query', getUsers?: { __typename?: 'UsersPayload', user?: Array<{ __typename?: 'User', _id: string, name: string, userName: string, phone?: string | null, password?: string | null, status?: boolean | null, role?: string | null } | null> | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'AdminPayload', admin?: { __typename?: 'Admin', _id: string, parentId?: string | null, name: string, userName: string, phone?: string | null, password?: string | null, role?: AdminRole | null, status?: boolean | null, creditLimit?: number | null, availableCredit?: number | null, creditGivenToAgent?: number | null, creditDistributedByAgent?: number | null } | null, error?: { __typename?: 'ErrorType', message: string, code: string } | null } | null };
+
+
+export const AuthAdminDocument = gql`
+    mutation AuthAdmin($input: AuthInput) {
+  authAdmin(input: $input) {
+    admin {
       _id
+      parentId
       name
       userName
+      phone
       password
       role
       status
       creditLimit
       availableCredit
-      creditGivenToAgent
-      creditDistributedByAgent
     }
+    token
     error {
       message
       code
@@ -308,38 +277,39 @@ export const AuthSuperAdminDocument = gql`
   }
 }
     `;
-export type AuthSuperAdminMutationFn = Apollo.MutationFunction<AuthSuperAdminMutation, AuthSuperAdminMutationVariables>;
+export type AuthAdminMutationFn = Apollo.MutationFunction<AuthAdminMutation, AuthAdminMutationVariables>;
 
 /**
- * __useAuthSuperAdminMutation__
+ * __useAuthAdminMutation__
  *
- * To run a mutation, you first call `useAuthSuperAdminMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAuthSuperAdminMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useAuthAdminMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAuthAdminMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [authSuperAdminMutation, { data, loading, error }] = useAuthSuperAdminMutation({
+ * const [authAdminMutation, { data, loading, error }] = useAuthAdminMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useAuthSuperAdminMutation(baseOptions?: Apollo.MutationHookOptions<AuthSuperAdminMutation, AuthSuperAdminMutationVariables>) {
+export function useAuthAdminMutation(baseOptions?: Apollo.MutationHookOptions<AuthAdminMutation, AuthAdminMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AuthSuperAdminMutation, AuthSuperAdminMutationVariables>(AuthSuperAdminDocument, options);
+        return Apollo.useMutation<AuthAdminMutation, AuthAdminMutationVariables>(AuthAdminDocument, options);
       }
-export type AuthSuperAdminMutationHookResult = ReturnType<typeof useAuthSuperAdminMutation>;
-export type AuthSuperAdminMutationResult = Apollo.MutationResult<AuthSuperAdminMutation>;
-export type AuthSuperAdminMutationOptions = Apollo.BaseMutationOptions<AuthSuperAdminMutation, AuthSuperAdminMutationVariables>;
+export type AuthAdminMutationHookResult = ReturnType<typeof useAuthAdminMutation>;
+export type AuthAdminMutationResult = Apollo.MutationResult<AuthAdminMutation>;
+export type AuthAdminMutationOptions = Apollo.BaseMutationOptions<AuthAdminMutation, AuthAdminMutationVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($input: ChangePasswordInput!) {
   changePassword(input: $input) {
     user {
+      _id
+      name
       userName
-      status
     }
     error {
       message
@@ -379,6 +349,7 @@ export const DeleteAdminDocument = gql`
   deleteAdmin(id: $deleteAdminId) {
     admin {
       _id
+      parentId
       name
       userName
     }
@@ -415,19 +386,59 @@ export function useDeleteAdminMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DeleteAdminMutationHookResult = ReturnType<typeof useDeleteAdminMutation>;
 export type DeleteAdminMutationResult = Apollo.MutationResult<DeleteAdminMutation>;
 export type DeleteAdminMutationOptions = Apollo.BaseMutationOptions<DeleteAdminMutation, DeleteAdminMutationVariables>;
+export const DeleteUserDocument = gql`
+    mutation DeleteUser($deleteUserId: ID!) {
+  deleteUser(id: $deleteUserId) {
+    token
+    user {
+      phone
+      userName
+      _id
+    }
+    error {
+      code
+      message
+    }
+  }
+}
+    `;
+export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+
+/**
+ * __useDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserMutation, { data, loading, error }] = useDeleteUserMutation({
+ *   variables: {
+ *      deleteUserId: // value for 'deleteUserId'
+ *   },
+ * });
+ */
+export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
+export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
+export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const RegisterAdminDocument = gql`
     mutation RegisterAdmin($input: AdminAuthInput) {
   registerAdmin(input: $input) {
+    error {
+      code
+      message
+    }
     admin {
       _id
-      parentId
       name
-      userName
-    }
-    token
-    error {
-      message
-      code
+      role
     }
   }
 }
@@ -458,25 +469,65 @@ export function useRegisterAdminMutation(baseOptions?: Apollo.MutationHookOption
 export type RegisterAdminMutationHookResult = ReturnType<typeof useRegisterAdminMutation>;
 export type RegisterAdminMutationResult = Apollo.MutationResult<RegisterAdminMutation>;
 export type RegisterAdminMutationOptions = Apollo.BaseMutationOptions<RegisterAdminMutation, RegisterAdminMutationVariables>;
-export const GetAdminsDocument = gql`
-    query GetAdmins($input: AdminListInput) {
-  getAdmins(input: $input) {
-    admin {
+export const RegisterUserDocument = gql`
+    mutation RegisterUser($input: SignUpInput) {
+  registerUser(input: $input) {
+    token
+    user {
       _id
-      parentId
       name
       userName
       phone
       password
-      role
       status
-      creditLimit
-      availableCredit
+      role
     }
     error {
       message
       code
     }
+  }
+}
+    `;
+export type RegisterUserMutationFn = Apollo.MutationFunction<RegisterUserMutation, RegisterUserMutationVariables>;
+
+/**
+ * __useRegisterUserMutation__
+ *
+ * To run a mutation, you first call `useRegisterUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerUserMutation, { data, loading, error }] = useRegisterUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRegisterUserMutation(baseOptions?: Apollo.MutationHookOptions<RegisterUserMutation, RegisterUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterUserMutation, RegisterUserMutationVariables>(RegisterUserDocument, options);
+      }
+export type RegisterUserMutationHookResult = ReturnType<typeof useRegisterUserMutation>;
+export type RegisterUserMutationResult = Apollo.MutationResult<RegisterUserMutation>;
+export type RegisterUserMutationOptions = Apollo.BaseMutationOptions<RegisterUserMutation, RegisterUserMutationVariables>;
+export const GetAdminsDocument = gql`
+    query GetAdmins($input: GetAdminInput) {
+  getAdmins(input: $input) {
+    _id
+    parentId
+    name
+    userName
+    phone
+    password
+    role
+    status
+    creditLimit
+    availableCredit
   }
 }
     `;
@@ -508,13 +559,62 @@ export function useGetAdminsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type GetAdminsQueryHookResult = ReturnType<typeof useGetAdminsQuery>;
 export type GetAdminsLazyQueryHookResult = ReturnType<typeof useGetAdminsLazyQuery>;
 export type GetAdminsQueryResult = Apollo.QueryResult<GetAdminsQuery, GetAdminsQueryVariables>;
-export const MeSuperAdminDocument = gql`
-    query MeSuperAdmin {
-  meSuperAdmin {
-    superAdmin {
+export const GetUsersDocument = gql`
+    query GetUsers($input: UsersInput) {
+  getUsers(input: $input) {
+    user {
       _id
       name
       userName
+      phone
+      password
+      status
+      role
+    }
+    error {
+      message
+      code
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+      }
+export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const MeDocument = gql`
+    query Me {
+  me {
+    admin {
+      _id
+      parentId
+      name
+      userName
+      phone
       password
       role
       status
@@ -532,28 +632,28 @@ export const MeSuperAdminDocument = gql`
     `;
 
 /**
- * __useMeSuperAdminQuery__
+ * __useMeQuery__
  *
- * To run a query within a React component, call `useMeSuperAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useMeSuperAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useMeSuperAdminQuery({
+ * const { data, loading, error } = useMeQuery({
  *   variables: {
  *   },
  * });
  */
-export function useMeSuperAdminQuery(baseOptions?: Apollo.QueryHookOptions<MeSuperAdminQuery, MeSuperAdminQueryVariables>) {
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MeSuperAdminQuery, MeSuperAdminQueryVariables>(MeSuperAdminDocument, options);
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
       }
-export function useMeSuperAdminLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeSuperAdminQuery, MeSuperAdminQueryVariables>) {
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MeSuperAdminQuery, MeSuperAdminQueryVariables>(MeSuperAdminDocument, options);
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
         }
-export type MeSuperAdminQueryHookResult = ReturnType<typeof useMeSuperAdminQuery>;
-export type MeSuperAdminLazyQueryHookResult = ReturnType<typeof useMeSuperAdminLazyQuery>;
-export type MeSuperAdminQueryResult = Apollo.QueryResult<MeSuperAdminQuery, MeSuperAdminQueryVariables>;
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;

@@ -1,0 +1,14 @@
+mutation DeleteUser($deleteUserId: ID!) {
+  deleteUser(id: $deleteUserId) {
+    token
+    user {
+      phone
+      userName
+      _id
+    }
+    error {
+      code
+      message
+    }
+  }
+}

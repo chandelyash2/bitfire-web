@@ -24,7 +24,7 @@ export const Account = () => {
             <h1 className="text-2xl border-b p-2 w-full">
               Balance Information
             </h1>
-            <div className="flex lg:w-[50%]">
+            <div className="flex w-full lg:w-[50%]">
               <span className="flex-1">Net Exposure</span>
               <span className="flex-2 text-green-400">0.00</span>
             </div>
@@ -48,16 +48,22 @@ export const Account = () => {
                 {userInfo?.availableCredit?.toLocaleString("en-US")}
               </span>
             </div>
-            <div className="flex lg:w-[50%]">
-              <span className="flex-1">Total credit given to Agents</span>
-              <span className="flex-2">
-                {userInfo?.creditGivenToAgent?.toLocaleString("en-US")}
-              </span>
-            </div>
-            <div className="flex lg:w-[50%]">
-              <span className="flex-1">Total credit distributed by Agents</span>
-              <span className="flex-2">0.00</span>
-            </div>
+            {userInfo?.role === "superadmin" && (
+              <>
+                <div className="flex lg:w-[50%]">
+                  <span className="flex-1">Total credit given to Agents</span>
+                  <span className="flex-2">
+                    {userInfo?.creditGivenToAgent?.toLocaleString("en-US")}
+                  </span>
+                </div>
+                <div className="flex lg:w-[50%]">
+                  <span className="flex-1">
+                    Total credit distributed by Agents
+                  </span>
+                  <span className="flex-2">0.00</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Container>

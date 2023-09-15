@@ -4,10 +4,11 @@ import { Layout } from "../common/Layout";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { AddUser } from "./AddUser";
 import Image from "next/image";
-import { UserRole, useGetUsersQuery } from "@/graphql/generated/schema";
+import { User, useGetUsersQuery } from "@/graphql/generated/schema";
 import { Loader } from "../common/Loader";
 import { DeleteUser } from "./DeleteUser";
 import { UserType } from "../types";
+import { CSVLink } from "react-csv";
 
 export const UserListing = () => {
   const [addModal, setAddModal] = useState(false);
@@ -23,13 +24,12 @@ export const UserListing = () => {
   const { loading, data, refetch } = useGetUsersQuery({
     variables: {
       input: {
-        filter: UserRole.User,
         limit: 10,
         offset: 0,
       },
     },
   });
-  const users = data?.getUsers?.user;
+  const users:any = data?.getUsers?.user;
   const handleAddUser = () => {
     setLabel("Add User");
     setAddModal(true);
@@ -40,7 +40,12 @@ export const UserListing = () => {
       <Container>
         <div className="flex justify-between w-full items-center">
           <h2 className="text-xl font-bold">User Listing</h2>
-          <div>
+          <div className="flex gap-4 w-[300px]">
+            {users && users?.length > 0 && (
+              <CSVLink data={users} filename="agent.csv" className="w-full">
+                <PrimaryButton label="Download CSV" />
+              </CSVLink>
+            )}
             <PrimaryButton label="Add User" handleClick={handleAddUser} />
           </div>
         </div>
@@ -56,7 +61,7 @@ export const UserListing = () => {
 
             <tbody className="flex flex-col gap-4 text-center">
               {users &&
-                users.map((user) => (
+                users.map((user:User) => (
                   <tr
                     className="flex justify-between lg:grid grid-cols-4 gap-2 text-center"
                     key={user?._id}

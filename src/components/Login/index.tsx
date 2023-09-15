@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { Loader } from "../common/Loader";
 import { useState } from "react";
-import { useAuthSuperAdminMutation } from "@/graphql/generated/schema";
+import { useAuthAdminMutation } from "@/graphql/generated/schema";
 interface FormValues {
   userName: string;
   password: string;
@@ -26,7 +26,7 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(FormSchema) });
-  const [login, { loading: userLoading }] = useAuthSuperAdminMutation();
+  const [login, { loading: userLoading }] = useAuthAdminMutation();
   const cookies = new Cookies();
   const router = useRouter();
   const submitHandler: SubmitHandler<FormValues> = async (data) => {
@@ -38,8 +38,8 @@ export const Login = () => {
         },
       },
     });
-    const response = result.data?.authSuperAdmin;
-    if (response?.superAdmin) {
+    const response = result.data?.authAdmin;
+    if (response?.admin) {
       cookies.set("token", response.token);
       router.push("/");
     }
@@ -49,8 +49,8 @@ export const Login = () => {
   };
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-10 lg:flex-row">
-      <div className="flex-[.8] flex flex-col items-center w-full">
-        <div className="flex flex-col gap-10 text-left">
+      <div className="flex-[.8] flex flex-col items-center w-full ">
+        <div className="flex flex-col gap-10 text-left items-center">
           <Image src="/bitlogo.png" width="100" height="100" alt="logo" />
           <h1 className="text-3xl font-bold lg:text-5xl">Welcome Back!</h1>
           <h3 className="text-xl font-semibold">Watch. Improve. Achieve.</h3>

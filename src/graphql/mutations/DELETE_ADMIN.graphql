@@ -2,6 +2,7 @@ mutation DeleteAdmin($deleteAdminId: ID!) {
   deleteAdmin(id: $deleteAdminId) {
     admin {
       _id
+      parentId
       name
       userName
     }

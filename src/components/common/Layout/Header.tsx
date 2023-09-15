@@ -34,9 +34,9 @@ export const Header = () => {
   const cookie = new Cookies();
 
   return (
-    <header>
+    <header className="lg:hidden ">
       <Container>
-        <div className="flex justify-between lg:hidden items-center">
+        <div className="flex justify-between  items-center">
           <Image src="/bitlogo.png" alt="logo" width="100" height="100" />
           <Image
             src="/hamburger.png"

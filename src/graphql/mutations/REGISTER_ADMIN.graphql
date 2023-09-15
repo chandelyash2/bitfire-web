@@ -1,15 +1,13 @@
 mutation RegisterAdmin($input: AdminAuthInput) {
   registerAdmin(input: $input) {
+    error {
+      code
+      message
+    }
     admin {
       _id
-      parentId
       name
-      userName
-    }
-    token
-    error {
-      message
-      code
+      role
     }
   }
 }

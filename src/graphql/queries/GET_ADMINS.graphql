@@ -1,20 +1,14 @@
-query GetAdmins($input: AdminListInput) {
+query GetAdmins($input: GetAdminInput) {
   getAdmins(input: $input) {
-    admin {
-      _id
-      parentId
-      name
-      userName
-      phone
-      password
-      role
-      status
-      creditLimit
-      availableCredit
-    }
-    error {
-      message
-      code
-    }
+    _id
+    parentId
+    name
+    userName
+    phone
+    password
+    role
+    status
+    creditLimit
+    availableCredit
   }
 }

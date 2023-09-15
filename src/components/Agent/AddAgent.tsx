@@ -4,14 +4,13 @@ import { Modal } from "../common/Modal";
 import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userSchema } from "./userSchema";
-
 import { Toaster, toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
 import { agentName, randomPassword } from "@/utils/uniqueGenerator";
+import { agentSchema } from "../User/userSchema";
 import {
   MeDocument,
-  useRegisterUserMutation,
+  useRegisterAdminMutation,
 } from "@/graphql/generated/schema";
 
 interface AddUserProps {
@@ -23,10 +22,9 @@ interface FormValues {
   name: string;
   userName: string;
   password: string;
-  phone?: string;
-  // creditLimit: number;
+  creditLimit: number;
 }
-export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
+export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
   const [randomAgent, setRandomAgent] = useState(agentName());
   const [RandomPassword, setRandompassword] = useState(randomPassword);
 
@@ -35,14 +33,14 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(userSchema),
+    resolver: yupResolver(agentSchema),
     defaultValues: {
       userName: randomAgent,
       password: RandomPassword,
     },
   });
 
-  const [addUser, { loading: addUserLoading }] = useRegisterUserMutation({
+  const [addUser, { loading: addUserLoading }] = useRegisterAdminMutation({
     refetchQueries: [MeDocument],
   });
   const submitHandler: SubmitHandler<FormValues> = async (value) => {
@@ -51,14 +49,14 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
         input: {
           name: value.name,
           password: value.password,
+          creditLimit: value.creditLimit,
           userName: value.userName,
-          phone: value.phone,
         },
       },
     });
-    const response = result.data?.registerUser;
-    if (response?.user) {
-      toast.success("User Added");
+    const response = result.data?.registerAdmin;
+    if (response?.admin) {
+      toast.success("Agent Added");
       refetch();
       setAddUser(false);
     }
@@ -104,13 +102,13 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
                 /> */}
               </div>
 
-              <Input
+              {/* <Input
                 label="Phone"
                 name="phone"
                 type="text"
                 error={errors.phone?.message}
                 register={register}
-              />
+              /> */}
               <div className="relative">
                 <Input
                   label="Password"
@@ -132,13 +130,13 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
                 /> */}
               </div>
 
-              {/* <Input
+              <Input
                 label="Credit Limit"
                 name="creditLimit"
                 type="number"
                 error={errors.creditLimit?.message}
                 register={register}
-              /> */}
+              />
             </div>
             <div className="w-full">
               <PrimaryButton label={label} type={ButtonType.submit} />

@@ -1,18 +1,18 @@
-mutation AuthSuperAdmin($input: AuthInput) {
-  authSuperAdmin(input: $input) {
-    token
-    superAdmin {
+mutation AuthAdmin($input: AuthInput) {
+  authAdmin(input: $input) {
+    admin {
       _id
+      parentId
       name
       userName
+      phone
       password
       role
       status
       creditLimit
       availableCredit
-      creditGivenToAgent
-      creditDistributedByAgent
     }
+    token
     error {
       message
       code

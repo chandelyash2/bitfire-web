@@ -1,9 +1,11 @@
-query MeSuperAdmin {
-  meSuperAdmin {
-    superAdmin {
+query Me {
+  me {
+    admin {
       _id
+      parentId
       name
       userName
+      phone
       password
       role
       status

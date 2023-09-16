@@ -1,6 +1,9 @@
 export const agentName = () => {
   return "agent_" + Math.floor(1000 + Math.random() * 9000);
 };
+export const userName = () => {
+  return "user_" + Math.floor(1000 + Math.random() * 9000);
+};
 export const randomPassword = () => {
   var chars =
     "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";

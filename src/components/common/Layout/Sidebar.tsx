@@ -45,7 +45,9 @@ const Sidebar = () => {
     <div className="hidden lg:flex flex-col h-screen w-full">
       <Container>
         <div className="flex">
-          <Image src="/bitlogo.png" alt="logo" width="80" height="80" />
+          <Link href="/">
+            <Image src="/bitlogo.png" alt="logo" width="80" height="80" />
+          </Link>
           <div className="flex absolute top-8 right-20 text-center gap-8">
             <div>
               <h2>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Input } from "../common/Input";
 import { Modal } from "../common/Modal";
 import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
@@ -7,11 +7,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Toaster, toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
 import { agentName, randomPassword } from "@/utils/uniqueGenerator";
-import { agentSchema } from "../User/userSchema";
+import * as yup from "yup";
 import {
   MeDocument,
   useRegisterAdminMutation,
 } from "@/graphql/generated/schema";
+import { CMSModal } from "@/context";
+import { agentSchema } from "../User/userSchema";
 
 interface AddUserProps {
   label: string;
@@ -25,18 +27,17 @@ interface FormValues {
   creditLimit: number;
 }
 export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
-  const [randomAgent, setRandomAgent] = useState(agentName());
-  const [RandomPassword, setRandompassword] = useState(randomPassword);
+  const { userInfo } = useContext(CMSModal);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(agentSchema),
+    resolver: yupResolver(agentSchema(userInfo.creditLimit)),
     defaultValues: {
-      userName: randomAgent,
-      password: RandomPassword,
+      userName: agentName(),
+      password: randomPassword(),
     },
   });
 

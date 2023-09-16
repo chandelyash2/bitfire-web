@@ -56,14 +56,16 @@ const Agent = () => {
         </div>
         <div className="overflow-x-auto">
           {users && users?.length > 0 ? (
-            <table className="mt-6 flex flex-col gap-4 ">
+            <table className="mt-6 flex flex-col gap-4 whitespace-nowrap w-full">
               <thead className="text-center ">
-                <tr className="grid grid-cols-7 gap-2 border-b">
+                <tr className="grid grid-cols-9 gap-2  border-b">
                   <td>Name</td>
                   <td>UserName</td>
                   <td>Status</td>
                   <td>Net Exposure</td>
                   <td>Take</td>
+                  <td>Give</td>
+                  <td>Available Credit</td>
                   <td>Credit Limit</td>
                 </tr>
               </thead>
@@ -72,7 +74,7 @@ const Agent = () => {
                 {users &&
                   users.map((user: Admin) => (
                     <tr
-                      className="grid grid-cols-7 gap-2 text-center"
+                      className="grid grid-cols-9 gap-2 text-center"
                       key={user?._id}
                     >
                       <td>{user?.name}</td>
@@ -80,6 +82,8 @@ const Agent = () => {
                       <td>{user?.status ? "Active" : "Inactive"}</td>
                       <td className="text-green-400">0.00</td>
                       <td className="text-green-400">0.00</td>
+                      <td className="text-green-400">0.00</td>
+                      <td>{user.availableCredit}</td>
                       <td>{user.creditLimit}</td>
 
                       <td>

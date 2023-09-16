@@ -34,7 +34,7 @@ export const Layout = ({ children }: LayoutProps) => {
   }
   return (
     <div
-      className="absolute top-0 bg-no-repeat w-screen h-screen bg-cover z-1 flex flex-col justify-between"
+      className="absolute top-0 bg-no-repeat w-screen h-auto bg-cover z-1 flex flex-col justify-between overflow-auto"
       style={{ backgroundImage: `url(${img})` }}
     >
       <Header />

@@ -64,6 +64,16 @@ export const Account = () => {
                 </div>
               </>
             )}
+            {userInfo?.role === "admin" && (
+              <>
+                <div className="flex lg:w-[50%]">
+                  <span className="flex-1">Total credit given to Users</span>
+                  <span className="flex-2">
+                    {userInfo?.creditGivenToUser?.toLocaleString("en-US")}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Container>

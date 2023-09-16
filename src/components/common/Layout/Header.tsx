@@ -4,24 +4,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { CMSModal } from "@/context";
 import Cookies from "universal-cookie";
+import { ChangePassword } from "@/components/ChangePassword";
+import { PrimaryButton } from "../PrimaryButton";
 export const Header = () => {
   const { userInfo } = useContext(CMSModal);
+  const [changePassword, setChangePassword] = useState(false);
+
   const listing = [
     {
       name: "Agent Management",
       link: "/agent",
-      visible: userInfo?.role === "Superadmin",
+      visible: userInfo?.role === "superadmin",
     },
-
     {
       name: "User",
       link: "/users",
-      visible: userInfo?.role === "Admin",
+      visible: userInfo?.role === "admin",
     },
     {
       name: "Account",
-      link: "/account",
-      visible: userInfo?.role === "Admin" || "Superadmin",
+      link: "/",
+      visible: userInfo?.role === "admin" || "superadmin",
     },
 
     {
@@ -79,6 +82,15 @@ export const Header = () => {
                     )
                 )}
               </ul>
+              <div className="mt-6">
+                <PrimaryButton
+                  label="Change Password"
+                  handleClick={() => setChangePassword(true)}
+                />
+              </div>
+              {changePassword && (
+                <ChangePassword setChangePassword={setChangePassword} />
+              )}
             </Container>
           </div>
         )}

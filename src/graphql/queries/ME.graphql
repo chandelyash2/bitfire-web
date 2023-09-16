@@ -13,6 +13,7 @@ query Me {
       availableCredit
       creditGivenToAgent
       creditDistributedByAgent
+      creditGivenToUser
     }
     error {
       message

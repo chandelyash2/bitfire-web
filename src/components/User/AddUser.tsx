@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Input } from "../common/Input";
 import { Modal } from "../common/Modal";
 import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
@@ -8,11 +8,12 @@ import { userSchema } from "./userSchema";
 
 import { Toaster, toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
-import { agentName, randomPassword } from "@/utils/uniqueGenerator";
+import { agentName, randomPassword, userName } from "@/utils/uniqueGenerator";
 import {
   MeDocument,
   useRegisterUserMutation,
 } from "@/graphql/generated/schema";
+import { CMSModal } from "@/context";
 
 interface AddUserProps {
   label: string;
@@ -24,21 +25,19 @@ interface FormValues {
   userName: string;
   password: string;
   phone?: string;
-  // creditLimit: number;
+  creditLimit: number;
 }
 export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
-  const [randomAgent, setRandomAgent] = useState(agentName());
-  const [RandomPassword, setRandompassword] = useState(randomPassword);
-
+  const { userInfo } = useContext(CMSModal);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(userSchema),
+    resolver: yupResolver(userSchema(userInfo.creditLimit)),
     defaultValues: {
-      userName: randomAgent,
-      password: RandomPassword,
+      userName: userName(),
+      password: randomPassword(),
     },
   });
 
@@ -53,6 +52,7 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
           password: value.password,
           userName: value.userName,
           phone: value.phone,
+          creditLimit: value.creditLimit,
         },
       },
     });
@@ -132,13 +132,13 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
                 /> */}
               </div>
 
-              {/* <Input
+              <Input
                 label="Credit Limit"
                 name="creditLimit"
                 type="number"
                 error={errors.creditLimit?.message}
                 register={register}
-              /> */}
+              />
             </div>
             <div className="w-full">
               <PrimaryButton label={label} type={ButtonType.submit} />

@@ -8,6 +8,8 @@ query GetUsers($input: UsersInput) {
       password
       status
       role
+      availableCredit
+      creditLimit
     }
     error {
       message

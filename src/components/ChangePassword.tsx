@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { forgetPasswordSchema } from "./User/userSchema";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { PrimaryButton } from "./common/PrimaryButton";
-import { useChangePasswordMutation } from "@/graphql/generated/schema";
+import { useAdminChangePasswordMutation } from "@/graphql/generated/schema";
 import toast, { Toaster } from "react-hot-toast";
 import { Loader } from "./common/Loader";
 interface ChangePasswordProp {
@@ -23,7 +23,7 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
   } = useForm({
     resolver: yupResolver(forgetPasswordSchema),
   });
-  const [changePswd, { loading }] = useChangePasswordMutation();
+  const [changePswd, { loading }] = useAdminChangePasswordMutation();
   const submiHandler: SubmitHandler<FormValues> = async (data) => {
     const response = await changePswd({
       variables: {
@@ -33,11 +33,11 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
         },
       },
     });
-    const output = response.data?.changePassword;
+    const output = response.data?.adminChangePassword;
     if (output?.error) {
       toast.error(output.error.message);
     }
-    if (output?.user) {
+    if (output?.admin) {
       toast.success("Password Changed Successfully");
       setChangePassword(false);
     }

@@ -88,14 +88,14 @@ const Agent = () => {
 
                       <td>
                         <div className="flex">
-                          <Image
+                          {/* <Image
                             src="/edit.png"
                             width={20}
                             height={20}
                             alt="'edit"
                             className="cursor-pointer"
                           />
-                          /
+                          / */}
                           <Image
                             src="/delete.png"
                             width={25}

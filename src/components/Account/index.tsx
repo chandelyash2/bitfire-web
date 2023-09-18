@@ -60,7 +60,7 @@ export const Account = () => {
                   <span className="flex-1">
                     Total credit distributed by Agents
                   </span>
-                  <span className="flex-2">0.00</span>
+                  <span className="flex-2">{userInfo?.creditDistributedByAgent.toLocaleString('en-Us')}</span>
                 </div>
               </>
             )}

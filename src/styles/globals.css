@@ -2,9 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-* body{
+* body {
   color: white;
-  background: url('/home.jpg');
+  background: rgb(73,43,129);
+  height: 100%;
+  width: 100vh;
 }
 
 table .td {

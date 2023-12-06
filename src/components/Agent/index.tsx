@@ -1,31 +1,40 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Layout } from "../common/Layout";
 import Container from "../common/Container";
 import { PrimaryButton } from "../common/PrimaryButton";
-import { Admin, useGetAdminsQuery } from "@/graphql/generated/schema";
-import { AdminType, UserType } from "../types";
-import Image from "next/image";
 import { Loader } from "../common/Loader";
-
 import { BalanceBanner } from "../common/BalanceBanner";
 import { CSVLink } from "react-csv";
 import { AddAgent } from "./AddAgent";
 import { DeleteAgent } from "./DeleteAgent";
+import { IoMdEye, IoMdLock, IoMdUnlock } from "react-icons/io";
+import { MdOutlineMoveDown } from "react-icons/md";
+import { EditAgent } from "./EditAgent";
+import Link from "next/link";
+import { UserType } from "../types";
+import {
+  User,
+  useGetUsersQuery,
+  useUpdateUserMutation,
+} from "@/graphql/generated/schema";
+import { CMSModal } from "@/context";
+import { Modal } from "../common/Modal";
+import { TransferStatus } from "./TransferStatus";
 
 const Agent = () => {
+  const { userInfo } = useContext(CMSModal);
   const [addModal, setAddModal] = useState(false);
   const [deleteUser, setDeleteUser] = useState(false);
   const [label, setLabel] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserType | null | AdminType>(
-    {
-      name: "",
-      _id: "",
-      userName: "",
-      creditLimit: 0,
-      status: false,
-    }
-  );
-  const { loading, data, refetch } = useGetAdminsQuery({
+  const [editUser, setEditUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserType | null>({
+    _id: "",
+    userName: "",
+    creditLimit: 0,
+  });
+  const [bettingStatus, setBettingStatus] = useState(false);
+  const [transferStatus, setTransferStatus] = useState(false);
+  const { loading, data, refetch } = useGetUsersQuery({
     variables: {
       input: {
         limit: 10,
@@ -33,9 +42,11 @@ const Agent = () => {
       },
     },
   });
-  const users: any = data?.getAdmins;
+
+  const users: any = data?.getUsers?.user;
+
   const handleAddUser = () => {
-    setLabel("Add Agent");
+    setLabel(userInfo?.role === "SUPERADMIN" ? "Add Agent" : "Add Member");
     setAddModal(true);
   };
 
@@ -54,61 +65,115 @@ const Agent = () => {
             <PrimaryButton label="Add Agent" handleClick={handleAddUser} />
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-auto">
           {users && users?.length > 0 ? (
-            <table className="mt-6 flex flex-col gap-4 whitespace-nowrap w-full">
-              <thead className="text-center ">
-                <tr className="grid grid-cols-9 gap-2  border-b">
-                  <td>Name</td>
-                  <td>UserName</td>
-                  <td>Status</td>
-                  <td>Net Exposure</td>
-                  <td>Take</td>
-                  <td>Give</td>
-                  <td>Available Credit</td>
-                  <td>Credit Limit</td>
+            <table className="mt-6">
+              <thead>
+                <tr className="text-sm">
+                  <th>UserName</th>
+                  <th>Downline</th>
+                  <th>Status</th>
+                  <th>Betting Status</th>
+                  <th>Transfer Status</th>
+                  <th>Details</th>
+                  <th>Net Exposure</th>
+                  <th>Take</th>
+                  <th>Give</th>
+                  <th>Available Credit</th>
+                  <th>Credit Limit</th>
+                  <th>Created</th>
                 </tr>
               </thead>
-
-              <tbody className="flex flex-col gap-4 text-center">
+              <tbody>
                 {users &&
-                  users.map((user: Admin) => (
-                    <tr
-                      className="grid grid-cols-9 gap-2 text-center"
-                      key={user?._id}
-                    >
-                      <td>{user?.name}</td>
-                      <td>{user?.userName}</td>
-                      <td>{user?.status ? "Active" : "Inactive"}</td>
+                  users.map((user: User) => (
+                    <tr key={user?._id}>
+                      <td
+                        className="text-secondary cursor-pointer"
+                        valign="middle"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setEditUser(true);
+                        }}
+                      >
+                        {user?.userName}
+                      </td>
+                      <td className="text-lg text-secondary">
+                        {userInfo?.role === "SUPERADMIN" ? (
+                          <span className="flex justify-center cursor-pointer">
+                            <Link
+                              href={`/agencyManagement/downline/${user._id}`}
+                            >
+                              <MdOutlineMoveDown />
+                            </Link>
+                          </span>
+                        ) : (
+                          "--"
+                        )}
+                      </td>
+                      <td>{user?.status}</td>
+                      <td className="text-lg text-green-500">
+                        <span className="flex justify-center cursor-pointer">
+                          {user.bettingStatus ? (
+                            <span
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setBettingStatus(true);
+                              }}
+                            >
+                              <IoMdUnlock />
+                            </span>
+                          ) : (
+                            <span
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setBettingStatus(true);
+                              }}
+                            >
+                              <IoMdLock />
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td className="text-lg text-green-500">
+                        <span className="flex justify-center cursor-pointer">
+                          {user.transferStatus ? (
+                            <span
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setTransferStatus(true);
+                              }}
+                            >
+                              <IoMdUnlock />
+                            </span>
+                          ) : (
+                            <span
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setTransferStatus(true);
+                              }}
+                            >
+                              <IoMdLock />
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td
+                        className="text-lg text-secondary"
+                        onClick={() =>
+                          sessionStorage.setItem("activeNav", "Report")
+                        }
+                      >
+                        <Link href={`/reports/downline-report/${user._id}`}>
+                          <IoMdEye />
+                        </Link>
+                      </td>
                       <td className="text-green-400">0.00</td>
                       <td className="text-green-400">0.00</td>
                       <td className="text-green-400">0.00</td>
                       <td>{user.availableCredit}</td>
                       <td>{user.creditLimit}</td>
-
-                      <td>
-                        <div className="flex">
-                          {/* <Image
-                            src="/edit.png"
-                            width={20}
-                            height={20}
-                            alt="'edit"
-                            className="cursor-pointer"
-                          />
-                          / */}
-                          <Image
-                            src="/delete.png"
-                            width={25}
-                            height={25}
-                            alt="'delete"
-                            className="cursor-pointer"
-                            onClick={() => {
-                              setDeleteUser(true);
-                              setSelectedUser(user);
-                            }}
-                          />
-                        </div>
-                      </td>
+                      <td>{user.createdAt}</td>
                     </tr>
                   ))}
               </tbody>
@@ -130,6 +195,16 @@ const Agent = () => {
             selectedUser={selectedUser}
             refetch={refetch}
           />
+        )}
+        {editUser && (
+          <EditAgent userData={selectedUser} setEditUser={setEditUser} />
+        )}
+        {transferStatus && (
+          <TransferStatus
+            setStatus={setTransferStatus}
+            label="Transfer"
+            userData={selectedUser}
+             value={false}          />
         )}
       </Container>
     </Layout>

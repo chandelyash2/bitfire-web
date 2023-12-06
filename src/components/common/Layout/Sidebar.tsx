@@ -3,49 +3,102 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
 import Container from "../Container";
-import { User } from "@/graphql/generated/schema";
-import Cookies from "universal-cookie";
 import { CMSModal } from "@/context";
 import { useContext, useState } from "react";
 import { PrimaryButton } from "../PrimaryButton";
 import { ChangePassword } from "@/components/ChangePassword";
-
+import { IoMdArrowDropdown, IoMdArrowDropup, IoMdLogOut } from "react-icons/io";
+import { deleteCookie } from "@/utils/cookies";
 const Sidebar = () => {
   const { userInfo } = useContext(CMSModal);
-  const [changePassword, setChangePassword] = useState(false);
 
+  const [changePassword, setChangePassword] = useState(false);
+  const [activeNav, setActiveNav] = useState(
+    sessionStorage.getItem("activeNav")
+  );
   const listing = [
     {
-      name: "Agent Management",
-      link: "/agent",
-      visible: userInfo?.role === "superadmin",
+      name: "Agency Management",
+      visible: userInfo?.role === "ADMIN" || "SUPERADMIN",
+      subLinks: [
+        {
+          name:
+            userInfo?.role === "SUPERADMIN"
+              ? "Agent Listing"
+              : "Member Listing",
+          link: "/agencyManagement/listing",
+        },
+        {
+          name: "Position Taking Listing",
+          link: "/agencyManagement/position",
+        },
+        {
+          name: "Transfer",
+          link: "/agencyManagement/transfer",
+        },
+      ],
     },
 
     {
-      name: "User",
-      link: "/users",
-      visible: userInfo?.role === "admin",
+      name: "Report",
+      visible: userInfo?.role === "ADMIN" || "SUPERADMIN",
+      subLinks: [
+        {
+          name: "P&L Report by Agent",
+          link: "/reports/p&l-by-agent",
+        },
+        {
+          name: "P&L Report by Market",
+          link: "/reports/p&l-by-market",
+        },
+        {
+          name: "Bet List",
+          link: "/reports/bet-list",
+        },
+        {
+          name: "Transfer Statement",
+          link: "/reports/transferStatement",
+        },
+      ],
+    },
+    {
+      name: "Risk Management",
+      visible: userInfo?.role === "ADMIN" || "SUPERADMIN",
+      subLinks: [
+        { name: "Net Exposure", link: "/riskManagement/netExposure" },
+        {
+          name: "Bet Ticker",
+          link: "/riskManagement/betTicker",
+        },
+      ],
     },
     {
       name: "Account",
-      link: "/",
-      visible: userInfo?.role === "admin" || "superadmin",
+      visible: userInfo?.role === "ADMIN" || "SUPERADMIN",
+      subLinks: [
+        {
+          name: "Balance",
+          link: "/account/balance",
+        },
+        {
+          name: "Statement",
+          link: "/account/statement",
+        },
+      ],
     },
-
     {
-      name: "Logout",
-      link: "/login",
-      visible: true,
+      name: "Commission",
+      link: "/commission",
+      visible: userInfo?.role === "SUPERADMIN",
     },
   ];
-  const cookie = new Cookies();
   const router = useRouter();
 
   return (
     <div className="hidden lg:flex flex-col h-screen w-full">
       <Container>
         <div className="flex">
-          <Link href="/">
+          <Link href="/account/balance">
             <Image src="/bitlogo.png" alt="logo" width="80" height="80" />
           </Link>
           <div className="flex absolute top-8 right-20 text-center gap-8">
@@ -62,31 +115,60 @@ const Sidebar = () => {
                 handleClick={() => setChangePassword(true)}
               />
             </div>
+            <Link
+              href="/login"
+              onClick={() => deleteCookie("token")}
+              className="flex items-center font-semibold"
+            >
+              <IoMdLogOut />
+              <h2> Logout</h2>
+            </Link>
           </div>
         </div>
-        <ul className="mt-10 flex flex-col gap-4 items-center text-xl">
-          {listing.map(
-            (item) =>
-              item.visible && (
-                <li
-                  key={item.link}
-                  className={twMerge(
-                    router.asPath === item.link
-                      ? "border-b w-full text-green-400"
-                      : "w-full",
-                    "hover:border-b border-secondary"
-                  )}
-                  onClick={() => {
-                    if (item.name === "Logout") {
-                      cookie.remove("token");
-                    }
-                  }}
-                >
-                  <Link href={item.link}>{item.name}</Link>
-                </li>
-              )
-          )}
-        </ul>
+        <div className="mt-10 flex flex-col gap-2 text-lg">
+          {listing.map((item) => (
+            <div key={item.name}>
+              <div
+                className={twMerge(
+                  " items-center cursor-pointer",
+                  item.visible ? "flex" : "hidden"
+                )}
+                onClick={() => {
+                  sessionStorage.setItem("activeNav", item.name);
+                  setActiveNav(item.name);
+                  item.link && router.push(item.link);
+                }}
+              >
+                <h2 className="flex-1">{item.name}</h2>
+                {item.subLinks && (
+                  <span>
+                    {activeNav === item.name ? (
+                      <IoMdArrowDropup />
+                    ) : (
+                      <IoMdArrowDropdown />
+                    )}
+                  </span>
+                )}
+              </div>
+              {item.subLinks && activeNav === item.name && (
+                <div className="flex flex-col gap-2 bg-header p-3 text-base">
+                  {item.subLinks.map((sub) => (
+                    <Link
+                      href={sub.link}
+                      key={sub.link}
+                      className={twMerge(
+                        router.asPath === sub.link &&
+                          "border-b border-green-500"
+                      )}
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
         {changePassword && (
           <ChangePassword setChangePassword={setChangePassword} />
         )}

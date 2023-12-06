@@ -1,8 +1,8 @@
 import { UserListing } from "@/components/User";
 import React from "react";
 
-const UsersPage = () => {
+const MemberListing = () => {
   return <UserListing />;
 };
 
-export default UsersPage;
+export default MemberListing;

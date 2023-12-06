@@ -1,0 +1,25 @@
+query GetUser($getUserId: ID) {
+  getUser(id: $getUserId) {
+    token
+    error {
+      message
+      code
+    }
+    user {
+      _id
+      userName
+      password
+      status
+      role
+      availableCredit
+      creditLimit
+      creditGivenToAgent
+      creditDistributedByAgent
+      creditGivenToUser
+      transferStatus
+      bettingStatus
+      loginStep
+      createdAt
+    }
+  }
+}

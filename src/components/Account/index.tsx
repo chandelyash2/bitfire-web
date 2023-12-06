@@ -7,7 +7,6 @@ import { CMSModal } from "@/context";
 
 export const Account = () => {
   const { userInfo } = useContext(CMSModal);
-  console.log(userInfo, "userInfo");
 
   return (
     <Layout>
@@ -48,7 +47,7 @@ export const Account = () => {
                 {userInfo?.availableCredit?.toLocaleString("en-US")}
               </span>
             </div>
-            {userInfo?.role === "superadmin" && (
+            {userInfo?.role === "SUPERADMIN" && (
               <>
                 <div className="flex lg:w-[50%]">
                   <span className="flex-1">Total credit given to Agents</span>
@@ -60,11 +59,13 @@ export const Account = () => {
                   <span className="flex-1">
                     Total credit distributed by Agents
                   </span>
-                  <span className="flex-2">{userInfo?.creditDistributedByAgent.toLocaleString('en-Us')}</span>
+                  <span className="flex-2">
+                    {userInfo?.creditDistributedByAgent.toLocaleString("en-Us")}
+                  </span>
                 </div>
               </>
             )}
-            {userInfo?.role === "admin" && (
+            {userInfo?.role === "ADMIN" && (
               <>
                 <div className="flex lg:w-[50%]">
                   <span className="flex-1">Total credit given to Users</span>

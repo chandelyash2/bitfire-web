@@ -1,15 +1,8 @@
-mutation AuthAdmin($input: AuthInput) {
-  authAdmin(input: $input) {
-    admin {
+mutation AuthLogin($input: AuthInput) {
+  authLogin(input: $input) {
+    user {
       _id
-      parentId
-      name
-      userName
-      phone
-      password
       role
-      status
-      creditLimit
       availableCredit
     }
     token

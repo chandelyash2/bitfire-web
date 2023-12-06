@@ -4,16 +4,19 @@ import { Modal } from "../common/Modal";
 import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
-import { agentName, randomPassword } from "@/utils/uniqueGenerator";
-import * as yup from "yup";
+import { randomPassword } from "@/utils/uniqueGenerator";
 import {
+  AccountStatus,
   MeDocument,
-  useRegisterAdminMutation,
+  UserRole,
+  useRegisterUserMutation,
 } from "@/graphql/generated/schema";
 import { CMSModal } from "@/context";
-import { agentSchema } from "../User/userSchema";
+import { agentSchema } from "./userSchema";
+import { RSelect } from "../common/RSelect";
+import { statusOption } from "./EditAgent";
 
 interface AddUserProps {
   label: string;
@@ -21,7 +24,7 @@ interface AddUserProps {
   refetch: () => void;
 }
 interface FormValues {
-  name: string;
+  status: AccountStatus;
   userName: string;
   password: string;
   creditLimit: number;
@@ -33,30 +36,32 @@ export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    setError,
   } = useForm({
-    resolver: yupResolver(agentSchema(userInfo.creditLimit)),
+    resolver: yupResolver(agentSchema(userInfo.availableCredit)),
     defaultValues: {
-      userName: agentName(),
       password: randomPassword(),
     },
   });
 
-  const [addUser, { loading: addUserLoading }] = useRegisterAdminMutation({
+  const [addUser, { loading: addUserLoading }] = useRegisterUserMutation({
     refetchQueries: [MeDocument],
   });
   const submitHandler: SubmitHandler<FormValues> = async (value) => {
     const result = await addUser({
       variables: {
         input: {
-          name: value.name,
           password: value.password,
           creditLimit: value.creditLimit,
           userName: value.userName,
+          status: value.status,
+          role: userInfo.role === "SUPERADMIN" ? UserRole.Admin : UserRole.User,
         },
       },
     });
-    const response = result.data?.registerAdmin;
-    if (response?.admin) {
+    const response = result.data?.registerUser;
+    if (response?.user) {
       toast.success("Agent Added");
       refetch();
       setAddUser(false);
@@ -75,13 +80,6 @@ export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
             onSubmit={handleSubmit(submitHandler)}
           >
             <div className="grid grid-cols-1 gap-4 ">
-              <Input
-                label="Name"
-                name="name"
-                type="text"
-                error={errors.name?.message}
-                register={register}
-              />
               <div className="relative">
                 <Input
                   label="User Name"
@@ -89,27 +87,9 @@ export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
                   type="text"
                   error={errors.userName?.message}
                   register={register}
-                  disabled={true}
                 />
-                {/* <Image
-                  src="/refresh.png"
-                  width={15}
-                  height={15}
-                  alt="refresh"
-                  className="absolute top-[50%] right-5 cursor-pointer"
-                  onClick={() => {
-                    setRandomAgent(agentName());
-                  }}
-                /> */}
               </div>
 
-              {/* <Input
-                label="Phone"
-                name="phone"
-                type="text"
-                error={errors.phone?.message}
-                register={register}
-              /> */}
               <div className="relative">
                 <Input
                   label="Password"
@@ -119,18 +99,16 @@ export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
                   register={register}
                   disabled={true}
                 />
-                {/* <Image
-                  src="/refresh.png"
-                  width={15}
-                  height={15}
-                  alt="refresh"
-                  className="absolute top-[50%] right-5 cursor-pointer"
-                  onClick={() => {
-                    setRandompassword(randomPassword());
-                  }}
-                /> */}
               </div>
-
+              <div>
+                <RSelect
+                  label="Status"
+                  option={statusOption}
+                  setValue={(data) => setValue("status", data)}
+                  error={errors.status?.message}
+                  setError={(data) => setError("status", data)}
+                />
+              </div>
               <Input
                 label="Credit Limit"
                 name="creditLimit"
@@ -143,8 +121,6 @@ export const AddAgent = ({ label, setAddUser, refetch }: AddUserProps) => {
               <PrimaryButton label={label} type={ButtonType.submit} />
             </div>
           </form>
-
-          <Toaster />
           {addUserLoading && <Loader />}
         </div>
       </Modal>

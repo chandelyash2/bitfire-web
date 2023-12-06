@@ -9,6 +9,16 @@
   width: 100vh;
 }
 
-table .td {
-  padding: 10px;
+table {
+  width: 100%;
+}
+
+td, th {
+  text-align: center;
+  padding: 8px;
+}
+
+tr {
+  border-bottom: 1px solid #dddddd;
+  height: 65px;
 }

@@ -4,12 +4,11 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ButtonType, PrimaryButton } from "../common/PrimaryButton";
-import Cookies from "universal-cookie";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { Loader } from "../common/Loader";
 import { useState } from "react";
-import { useAuthAdminMutation } from "@/graphql/generated/schema";
+import { useAuthLoginMutation } from "@/graphql/generated/schema";
 interface FormValues {
   userName: string;
   password: string;
@@ -26,8 +25,7 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(FormSchema) });
-  const [login, { loading: userLoading }] = useAuthAdminMutation();
-  const cookies = new Cookies();
+  const [login, { loading: userLoading }] = useAuthLoginMutation();
   const router = useRouter();
   const submitHandler: SubmitHandler<FormValues> = async (data) => {
     const result = await login({
@@ -38,9 +36,12 @@ export const Login = () => {
         },
       },
     });
-    const response = result.data?.authAdmin;
-    if (response?.admin) {
-      cookies.set("token", response.token);
+    const response = result.data?.authLogin;
+    console.log(response,"respinse");
+    
+    if (response?.user) {
+      response.token && sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem("activeNav", "Account");
       router.push("/");
     }
     if (response?.error) {
@@ -92,8 +93,8 @@ export const Login = () => {
             </div>
             <PrimaryButton label="Submit" type={ButtonType.submit} />
           </form>
-          <Toaster />
           {userLoading && <Loader />}
+          <Toaster />
         </div>
       </div>
     </div>

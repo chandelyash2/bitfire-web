@@ -19,7 +19,7 @@ export const social = [
 export const Footer = () => {
   const date = new Date().getFullYear();
   return (
-    <footer className="lg:absolute bottom-0 bg-header w-full">
+    <footer className="bg-header w-full">
       <Container>
         <div className="flex justify-between items-center">
           <Image src="/bitlogo.png" alt="logo" width="80" height="80" />

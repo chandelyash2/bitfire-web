@@ -24,9 +24,6 @@ export type ResolverContext = {
   res?: ServerResponse;
 };
 
-function parseCookies(_context: any, options = {}) {
-  return cookie.parse(document.cookie, options);
-}
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -62,8 +59,7 @@ const cache = new InMemoryCache({
 
 function createApolloClient(context?: ResolverContext) {
   const authLink = setContext((_, { headers }) => {
-    const { token } = parseCookies('token');
-
+    const token= sessionStorage.getItem('token');
     return {
       headers: {
         ...headers,

@@ -4,16 +4,18 @@ import { Modal } from "../common/Modal";
 import { PrimaryButton, ButtonType } from "../common/PrimaryButton";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userSchema } from "./userSchema";
+import { userSchema } from "../Agent/userSchema";
 
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { Loader } from "../common/Loader";
-import { agentName, randomPassword, userName } from "@/utils/uniqueGenerator";
+import { randomPassword, userName } from "@/utils/uniqueGenerator";
 import {
   MeDocument,
   useRegisterUserMutation,
 } from "@/graphql/generated/schema";
 import { CMSModal } from "@/context";
+import { RSelect } from "../common/RSelect";
+import { statusOption } from "../Agent/EditAgent";
 
 interface AddUserProps {
   label: string;
@@ -21,7 +23,6 @@ interface AddUserProps {
   refetch: () => void;
 }
 interface FormValues {
-  name: string;
   userName: string;
   password: string;
   phone?: string;
@@ -33,10 +34,11 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    setError,
   } = useForm({
     resolver: yupResolver(userSchema(userInfo.creditLimit)),
     defaultValues: {
-      userName: userName(),
       password: randomPassword(),
     },
   });
@@ -48,10 +50,8 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
     const result = await addUser({
       variables: {
         input: {
-          name: value.name,
           password: value.password,
           userName: value.userName,
-          phone: value.phone,
           creditLimit: value.creditLimit,
         },
       },
@@ -72,38 +72,17 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
         <h1 className="font-bold text-xl">{label} </h1>
         <div className="flex justify-center">
           <form
-            className="mt-5 w-full lg:w-[50%]"
+            className="mt-5 w-full lg:w-[80%]"
             onSubmit={handleSubmit(submitHandler)}
           >
-            <div className="grid grid-cols-1 gap-4 ">
+            <div className="grid grid-cols-2 gap-4 ">
               <Input
-                label="Name"
-                name="name"
+                label="User Name"
+                name="userName"
                 type="text"
-                error={errors.name?.message}
+                error={errors.userName?.message}
                 register={register}
               />
-              <div className="relative">
-                <Input
-                  label="User Name"
-                  name="userName"
-                  type="text"
-                  error={errors.userName?.message}
-                  register={register}
-                  disabled={true}
-                />
-                {/* <Image
-                  src="/refresh.png"
-                  width={15}
-                  height={15}
-                  alt="refresh"
-                  className="absolute top-[50%] right-5 cursor-pointer"
-                  onClick={() => {
-                    setRandomAgent(agentName());
-                  }}
-                /> */}
-              </div>
-
               <Input
                 label="Phone"
                 name="phone"
@@ -111,26 +90,15 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
                 error={errors.phone?.message}
                 register={register}
               />
-              <div className="relative">
-                <Input
-                  label="Password"
-                  name="password"
-                  type="text"
-                  error={errors.password?.message}
-                  register={register}
-                  disabled={true}
-                />
-                {/* <Image
-                  src="/refresh.png"
-                  width={15}
-                  height={15}
-                  alt="refresh"
-                  className="absolute top-[50%] right-5 cursor-pointer"
-                  onClick={() => {
-                    setRandompassword(randomPassword());
-                  }}
-                /> */}
-              </div>
+
+              <Input
+                label="Password"
+                name="password"
+                type="text"
+                error={errors.password?.message}
+                register={register}
+                disabled={true}
+              />
 
               <Input
                 label="Credit Limit"
@@ -140,12 +108,19 @@ export const AddUser = ({ label, setAddUser, refetch }: AddUserProps) => {
                 register={register}
               />
             </div>
+            <div>
+              <RSelect
+                label="Status"
+                option={statusOption}
+                setValue={(data) => setValue("status", data)}
+                error={errors.status?.message}
+                setError={(data) => setError("status", data)}
+              />
+            </div>
             <div className="w-full">
               <PrimaryButton label={label} type={ButtonType.submit} />
             </div>
           </form>
-
-          <Toaster />
           {addUserLoading && <Loader />}
         </div>
       </Modal>

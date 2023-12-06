@@ -1,8 +1,8 @@
 import { Account } from "@/components/Account";
 import React from "react";
 
-const AccountPage = () => {
+const BalancePage = () => {
   return <Account />;
 };
 
-export default AccountPage;
+export default BalancePage;

@@ -9,12 +9,16 @@ import { Loader } from "../common/Loader";
 import { DeleteUser } from "./DeleteUser";
 import { UserType } from "../types";
 import { CSVLink } from "react-csv";
+import { BalanceBanner } from "../common/BalanceBanner";
+import Link from "next/link";
+import { IoMdUnlock, IoMdLock, IoMdEye } from "react-icons/io";
+import { MdOutlineMoveDown } from "react-icons/md";
+import { EditAgent } from "../Agent/EditAgent";
 
 export const UserListing = () => {
   const [addModal, setAddModal] = useState(false);
-  const [deleteUser, setDeleteUser] = useState(false);
+  const [editUser, setEditUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>({
-    name: "",
     _id: "",
     password: "",
     userName: "",
@@ -38,8 +42,9 @@ export const UserListing = () => {
   return (
     <Layout>
       <Container>
-        <div className="flex justify-between w-full items-center">
-          <h2 className="text-xl font-bold">User Listing</h2>
+        <BalanceBanner />
+        <div className="mt-8 flex justify-between w-full items-center">
+          <h2 className="text-xl font-bold">Member Listing</h2>
           <div className="flex gap-4 w-[300px]">
             {users && users?.length > 0 && (
               <CSVLink data={users} filename="agent.csv" className="w-full">
@@ -50,51 +55,60 @@ export const UserListing = () => {
           </div>
         </div>
         {users && users?.length > 0 ? (
-          <table className="mt-6 flex flex-col gap-4 w-full ">
-            <thead className="text-center ">
-              <tr className="flex justify-between lg:grid grid-cols-5 gap-2 border-b">
-                <td>Name</td>
-                <td>UserName</td>
-                <td>Phone</td>
-                <td>Available Credit</td>
+          <table className="mt-6">
+            <thead>
+              <tr className="text-sm">
+                <th>UserName</th>
+                <th>Downline</th>
+                <th>Status</th>
+                <th>Betting Status</th>
+                <th>Transfer Status</th>
+                <th>Details</th>
+                <th>Net Exposure</th>
+                <th>Take</th>
+                <th>Give</th>
+                <th>Available Credit</th>
+                <th>Credit Limit</th>
+                <th>Created</th>
               </tr>
             </thead>
 
-            <tbody className="flex flex-col gap-4 text-center">
+            <tbody>
               {users &&
                 users.map((user: User) => (
-                  <tr
-                    className="flex justify-between lg:grid grid-cols-5 gap-2 text-center"
-                    key={user?._id}
-                  >
-                    <td>{user?.name}</td>
-                    <td>{user?.userName}</td>
-                    <td>{user?.phone}</td>
-                    <td>{user?.availableCredit}</td>
-
-                    <td>
-                      <div className="flex">
-                        {/* <Image
-                          src="/edit.png"
-                          width={20}
-                          height={20}
-                          alt="'edit"
-                          className="cursor-pointer"
-                        />
-                        / */}
-                        <Image
-                          src="/delete.png"
-                          width={25}
-                          height={25}
-                          alt="'delete"
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setDeleteUser(true);
-                            setSelectedUser(user);
-                          }}
-                        />
-                      </div>
+                  <tr key={user?._id}>
+                    <td
+                      className="text-secondary cursor-pointer"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setEditUser(true);
+                      }}
+                    >
+                      {user?.userName}
                     </td>
+                    <td className="flex justify-center text-lg text-secondary">
+                      --
+                    </td>
+                    <td>{user?.status}</td>
+                    <td className="text-lg text-green-500">
+                      <span className="flex justify-center cursor-pointer">
+                        {user.bettingStatus ? <IoMdUnlock /> : <IoMdLock />}
+                      </span>
+                    </td>
+                    <td className="text-lg text-green-500">
+                      <span className="flex justify-center cursor-pointer">
+                        {user.transferStatus ? <IoMdUnlock /> : <IoMdLock />}
+                      </span>
+                    </td>
+                    <td className="flex justify-center text-lg text-secondary">
+                      <IoMdEye />
+                    </td>
+                    <td className="text-green-400">0.00</td>
+                    <td className="text-green-400">0.00</td>
+                    <td className="text-green-400">0.00</td>
+                    <td>{user.availableCredit}</td>
+                    <td>{user.creditLimit}</td>
+                    <td>{user.createdAt}</td>
                   </tr>
                 ))}
             </tbody>
@@ -112,13 +126,8 @@ export const UserListing = () => {
             refetch={refetch}
           />
         )}
-        {deleteUser && (
-          <DeleteUser
-            setDeleteUser={setDeleteUser}
-            selectedUser={selectedUser}
-            refetch={refetch}
-            label="User"
-          />
+        {editUser && (
+          <EditAgent userData={selectedUser} setEditUser={setEditUser} />
         )}
       </Container>
     </Layout>

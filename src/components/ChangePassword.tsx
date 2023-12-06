@@ -2,20 +2,22 @@ import React from "react";
 import { Modal } from "./common/Modal";
 import { Input } from "./common/Input";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { forgetPasswordSchema } from "./User/userSchema";
+import { forgetPasswordSchema } from "./Agent/userSchema";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { PrimaryButton } from "./common/PrimaryButton";
-import { useAdminChangePasswordMutation } from "@/graphql/generated/schema";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Loader } from "./common/Loader";
+import { useChangePasswordMutation } from "@/graphql/generated/schema";
+import { useRouter } from "next/router";
+import { deleteCookie } from "@/utils/cookies";
 interface ChangePasswordProp {
-  setChangePassword: (value: boolean) => void;
+  setChangePassword?: (value: boolean) => void;
 }
 interface FormValues {
-  oldPassword: string;
   newPassword: string;
 }
 export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -23,37 +25,31 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
   } = useForm({
     resolver: yupResolver(forgetPasswordSchema),
   });
-  const [changePswd, { loading }] = useAdminChangePasswordMutation();
+  const [changePswd, { loading }] = useChangePasswordMutation();
   const submiHandler: SubmitHandler<FormValues> = async (data) => {
     const response = await changePswd({
       variables: {
         input: {
-          oldPassword: data.oldPassword,
           newPassword: data.newPassword,
         },
       },
     });
-    const output = response.data?.adminChangePassword;
+    const output = response.data?.changePassword;
     if (output?.error) {
       toast.error(output.error.message);
     }
-    if (output?.admin) {
+    if (output?.user) {
       toast.success("Password Changed Successfully");
-      setChangePassword(false);
+      setChangePassword && setChangePassword(false);
+      router.push("/login");
+      deleteCookie("token");
     }
   };
   return (
-    <Modal close={() => setChangePassword(false)}>
+    <Modal close={() => setChangePassword && setChangePassword(false)}>
       <h1 className="font-bold text-xl">Change Password</h1>
 
       <form className="mt-5 w-full" onSubmit={handleSubmit(submiHandler)}>
-        <Input
-          label="Old Password"
-          name="oldPassword"
-          type="password"
-          error={errors.oldPassword?.message}
-          register={register}
-        />
         <Input
           label="New Password"
           name="newPassword"
@@ -69,7 +65,6 @@ export const ChangePassword = ({ setChangePassword }: ChangePasswordProp) => {
           register={register}
         />
         <PrimaryButton label="Change" />
-        <Toaster />
         {loading && <Loader />}
       </form>
     </Modal>

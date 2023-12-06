@@ -4,7 +4,7 @@ import {
   useDeleteAdminMutation,
   useDeleteUserMutation,
 } from "@/graphql/generated/schema";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { PrimaryButton } from "../common/PrimaryButton";
 import Container from "../common/Container";
 import { Loader } from "../common/Loader";
@@ -58,7 +58,6 @@ export const DeleteUser = ({
           </div>
         </div>
       </Container>
-      <Toaster />
       {deleteuserLaoding && <Loader />}
     </Modal>
   );

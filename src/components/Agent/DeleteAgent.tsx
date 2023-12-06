@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "../common/Modal";
 import { useDeleteAdminMutation } from "@/graphql/generated/schema";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { PrimaryButton } from "../common/PrimaryButton";
 import Container from "../common/Container";
 import { Loader } from "../common/Loader";
@@ -55,7 +55,6 @@ export const DeleteAgent = ({
           </div>
         </div>
       </Container>
-      <Toaster />
       {deleteuserLaoding && <Loader />}
     </Modal>
   );

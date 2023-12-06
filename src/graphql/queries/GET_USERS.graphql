@@ -2,14 +2,19 @@ query GetUsers($input: UsersInput) {
   getUsers(input: $input) {
     user {
       _id
-      name
       userName
-      phone
       password
       status
       role
       availableCredit
       creditLimit
+      creditGivenToAgent
+      creditDistributedByAgent
+      creditGivenToUser
+      transferStatus
+      bettingStatus
+      loginStep
+      createdAt
     }
     error {
       message

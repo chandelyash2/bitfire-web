@@ -1,8 +1,8 @@
 import Agent from "@/components/Agent";
 import React from "react";
 
-const AgentPage = () => {
+const AgentListing = () => {
   return <Agent />;
 };
 
-export default AgentPage;
+export default AgentListing;

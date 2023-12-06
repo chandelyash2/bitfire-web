@@ -1,23 +1,25 @@
 query Me {
   me {
-    admin {
+    user {
       _id
-      parentId
-      name
-      userName
-      phone
+      availableCredit
+      bettingStatus
+      createdAt
+      creditLimit
+      loginStep
       password
       role
       status
-      creditLimit
-      availableCredit
+      transferStatus
+      userName
       creditGivenToAgent
-      creditDistributedByAgent
       creditGivenToUser
+      creditDistributedByAgent
     }
     error {
       message
       code
     }
+    token
   }
 }
